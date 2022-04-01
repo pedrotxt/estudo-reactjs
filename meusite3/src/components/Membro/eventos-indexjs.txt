@@ -1,0 +1,32 @@
+import React, { Component } from "react";
+
+class Membro extends Component{
+
+    constructor(props){
+        super(props);
+        this.state = {
+            nome: props.nome
+        };
+
+        this.entrar = this.entrar.bind(this);
+    }
+
+    entrar(nome){
+        this.setState({nome: nome})
+    }
+
+    // Passando uma função anonima para o onclick de Entrar, pois ele so vai ser executado essa função entrar quando clicar no botão, fazendo não dar erro
+    // Errado: <button onClick={this.entrar('Pedro')}>Entrar no sistema</button>
+    render(){
+        return(
+            <div>
+                <h2>Bem-Vindo(a) {this.state.nome}</h2>
+                <button onClick={() => this.entrar('Lua')}>Entrar no sistema</button>
+                <button onClick={() => this.setState({nome: ''})}>Sair</button>
+            </div>
+        );
+    }
+}
+
+// Exportando para alguem poder utilizar esse componente
+export default Membro;

@@ -1,0 +1,16 @@
+// Começando a criar componentes em arquivos separados para organização.
+
+import React, { Component } from "react";
+import Membro from "./components/Membro";
+
+class App extends Component{
+    render(){
+        return(
+            <div>
+                <Membro nome="Visitante"/>
+            </div>
+        )
+    }
+}
+
+export default App;

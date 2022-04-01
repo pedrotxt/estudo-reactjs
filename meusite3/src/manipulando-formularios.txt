@@ -1,0 +1,54 @@
+import React, { Component } from "react";
+// Cada vez que eu digito algo ou escrevo algo ele chama o onChange, que nesse codigo vai chamar nossa função criada trocaEmail(), e o trocaEmail vai pegar o valor que ele digitou com o e.target.value e vai salvar no let valorDigitado, depois setamos o novo valor para nosso set email agora com o valor atualizado. Então cada vez que digitamos ele chama essa função e aparece na tela o novo valor. 
+
+// Aprender e trabalhar com Formularios
+// Criar um exemplo de formulario de email e senha
+class App extends Component{
+
+    constructor(props){
+        super(props);
+        this.state = {
+            email: '',
+            senha: '',
+            sexo: 'masculino'
+        };
+
+        this.trocaEmail = this.trocaEmail.bind(this);
+    }
+
+    // Quando tratamos input e passamos esse onChange passando para nossa função, dentro da nossa função colocamos nos parametros um evento (e)
+    // Podemos fazer direto com uma função anonima sem precisar criar essa função assim, exemplo está no campo Senha do render
+    trocaEmail(e){
+        let valorDigitado = e.target.value;
+
+        this.setState({email: valorDigitado})
+    }
+    
+    // Quando tiver alguma mudança no input, pegamos o valor com onChange e salva na state com o valor que ele digitou
+    render(){
+        return(
+            <div>
+                <h2>Login</h2>
+                Email:
+                <input type="email" name="email" value={this.state.email} onChange={this.trocaEmail}/> <br/>
+
+                Senha:
+                <input type="password" name="senha" value={this.state.senha} onChange={(e) => this.setState({senha: e.target.value})}/>
+
+                Sexo:
+                <select name="sexo" value={this.state.sexo} onChange={(e) => this.setState({sexo: e.target.value})}>
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                </select>
+
+                <div>
+                    <h3>{this.state.email}</h3>
+                    <h3>{this.state.senha}</h3>
+                    <h3>{this.state.sexo}</h3>
+                </div>
+            </div>
+        );
+    }
+}
+
+export default App;

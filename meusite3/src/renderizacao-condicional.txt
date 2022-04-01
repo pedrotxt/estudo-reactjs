@@ -1,0 +1,49 @@
+import React, { Component } from "react";
+
+// Aprender a trabalhar com renderização condicional: Quando você quer rendezirar alguma coisa ou outra dentro do seu componente.
+class App extends Component{
+
+    constructor(props){
+        super(props);
+        this.state = {
+            // Caso status seja true, dizer que ele está logado no sistema
+            status: true
+        };
+
+        this.entrar = this.entrar.bind(this);
+        this.sair = this.sair.bind(this);
+    }
+
+    entrar(){
+        this.setState({
+            status: true
+        });
+    }
+
+    sair(){
+        this.setState({
+            status: false
+        });
+    }
+
+    // se for true(?) execute, mas se for false(:) execute
+    render(){
+        return(
+            <div>
+                {this.state.status ?
+                <div>
+                    <h2>Bem-Vindo ao sistema!</h2>
+                    <button onClick={this.sair}>Sair do sistema</button>
+                </div> : 
+                <div>
+                    <h2>Olá visitante, faça o login!</h2>
+                    <button onClick={this.entrar}>Entrar no sistema</button>
+                </div>
+                }
+                
+            </div>
+        )
+    }
+}
+
+export default App;

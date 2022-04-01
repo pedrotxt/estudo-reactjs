@@ -1,0 +1,37 @@
+import React, { Component } from "react";
+import Feed from "./components/Membro";
+
+// Aprender e trabalhar com listas, aprendendo a renderizar listas pra gente montar para nosso usuario.
+class App extends Component{
+
+    constructor(props){
+        super(props);
+        this.state = {
+            feed: [
+                {id: 1, username: "Luana", curtidas: 800, comentarios: 40},
+                {id: 2, username: "Pedro", curtidas: 1, comentarios: 0},
+                {id: 3, username: "Flash", curtidas: 10000, comentarios: 69}
+            ]
+        };
+    }
+    
+    // Utilizar o Map(), para varrer toda a nossa lista de objetos e construir nosso componente pro usuario da forma que a gente quiser. map() recebe uma função anonima e pro parametro ele recebe por exemplo: item
+    // O map() vai passar de objeto por objeto, pegando id, username, curtidas, comentarios e colocando dentro de item pra gente poder acessar e mostrar para o usuario. 
+    render(){
+        return(
+            <div>
+                {this.state.feed.map((item) => {
+                    // precisamos passar a key unica de cada um
+                    return(
+                        <div>
+                            <Feed id={item.id} username={item.username} curtidas={item.curtidas} comentarios={item.comentarios}/>
+                        </div>
+                    );
+                })
+                }
+            </div>
+        )
+    }
+}
+
+export default App;
