@@ -1,0 +1,273 @@
+import firebase from "./firabaseConnection";
+import './styles.css';
+import { useState, useEffect } from "react";
+
+function App() {
+  const [idPost, setIdPost] = useState('');
+  const [titulo, setTitulo] = useState('');
+  const [autor, setAutor] = useState('');
+  // um array pois vai ser uma lista
+  const [posts, setPosts] = useState([]);
+
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [user, setUser] = useState(false);
+  const [userLogged, setUserLogged] = useState({});
+
+  // Implementando Real Time: Exemplo de quando usar - Em alguma área do site que você não quer que ele tenha que atualizar o site pra ver essas novas informações eu posso implementar o real time
+  // Pra isso eu preciso usar um ciclo de vida e vou usar o useEffect
+  // array vazio: quando eu abrir a minha aplicação ele vai chamar o que tem dentro da função
+  useEffect(()=>{
+    async function loadPosts(){
+      await firebase.firestore().collection('posts')
+      .onSnapshot((doc)=>{
+        let meusPosts = [];
+
+        doc.forEach((item)=>{
+          meusPosts.push({
+            id: item.id,
+            titulo: item.data().titulo,
+            autor: item.data().autor
+          })
+        });
+        setPosts(meusPosts);
+
+      })
+    }
+
+    loadPosts();
+  },[])
+
+  // Permanencia de Login, se der um F5 ou sair e entrar no navegador ele vai perceber automaticamente que você ja estava logado e vai te logar sem que você precise preencher Usuario e Senha e clique em logar
+  useEffect(()=>{
+    // Verificar se ja tem algum usuario logado
+    async function checkLogin(){
+      // onAuthStateChanged: ele fica sempre olhando o estado do nosso usuario - se tiver um login ele vai receber isso, ou se o usuario se deslogar também por exemplo.
+      // por baixo dos panos ele salvo esse nosso usuario lá no localStorage
+      await firebase.auth().onAuthStateChanged((user)=>{
+        if(user){
+          setUser(true);
+          setUserLogged({
+            uid: user.uid,
+            email: user.email
+          })
+          // Se tiver usuario logado entra aqui dentro
+        }else{
+          setUser(false);
+          setUserLogged({})
+          // Não possui nenhum user logado
+        }
+      })
+
+    }
+    
+    checkLogin();
+  },[]);
+
+  // para adicionar, como é algo assincrono, ele vai até o meu banco pela internet e etc, então como o usuario precisa esperar essa requisição, a gente transforma a função em async para ela esperar essa requisição ser feita de fato e depois fazer o que tem que fazer
+  async function handleAdd(){
+
+    // collection('') qual coleção do banco firestore eu quero acessar
+    // .doc('') qual documento do banco eu quero acessar
+    await firebase.firestore().collection('posts')
+
+    // 1 Exemplo:
+    // Inserindo id manualmente
+    //.doc('12345')
+    // dentro desse documento eu quero criar alguma coisa, então eu uso .set, nele eu estou passando algum objeto; preciso passar a proprieda igual está la no banco e em seguida o que vai ser mandado.
+    //.set({
+    //  titulo: titulo,
+    //  autor: autor
+    //})
+    // o .set é um Promise, então ele vai devolver caso de sucesso e caso de erro/ então em caso de sucesso(ele for adicionado com sucesso no documento 12345 na coleção posts) ele cai dentro do .then
+
+    // 2 Exemplo:
+    // o firestore entede o .add dentro da collection que você passou e faz com que ele cria um doc com id aleatorio sem precisar escrever manualmente igual no 1 exemplo.
+    .add({
+      titulo: titulo,
+      autor: autor
+    })
+    .then(()=> {
+      console.log('Dados')
+      setTitulo('');
+      setAutor('');
+    })
+    // em caso de false ele vai cair no .catch
+    .catch((error)=> {
+      console.log('Erro: ' + error)
+    })
+  }
+
+  // Buscando Post // Agora com Real Time no useEffect - linha 15
+  async function buscaPost(){
+    await firebase.firestore().collection('posts')
+
+    // Exemplo 1:
+    // Criando função para buscar item unico dentro do firestore
+    //.doc('123')
+    //.get()
+    //.then((snapshot)=>{
+    //  setTitulo(snapshot.data().titulo)
+    //  setAutor(snapshot.data().autor)
+    //})
+    
+    //.catch(()=>{
+    //  console.log('Erro')
+    //})
+
+    // Exemplo 2:
+    // Criando função para buscar uma lista com todos item do firestore
+    // Criar um useState pra armazenar um array para lista
+    // Não vou especificar qual doc eu quero trazer e sim vou buscar tudo
+    .get()
+    .then((snapshot)=>{
+      let lista = [];
+
+      // Percorrer e entrar em todos os documentos
+      // snapshot ta percorrendo todos os documentos, entrando nesse doc e colocando dentro da variavel lista o id, titulo e autor até ele percorrer todos os doc que estão na collection posts
+      snapshot.forEach((doc)=>{
+        lista.push({
+          id: doc.id,
+          titulo: doc.data().titulo,
+          autor: doc.data().autor
+        })
+      })
+
+      // Atualiza nosso useStates com todos itens que tem dentro da collection posts
+      setPosts(lista);
+
+    })
+    .catch(()=>{
+      console.log('Deu algum erro')
+    })
+  }
+
+  // Editando o Post
+  async function editarPost(){
+    await firebase.firestore().collection('posts')
+    // Pegando o doc que ele digitou no input do id
+    .doc(idPost)
+    .update({
+      titulo: titulo,
+      autor: autor
+    })
+    .then(()=>{
+      console.log('Dados atualizados com sucesso')
+      setIdPost('');
+      setTitulo('');
+      setAutor('');
+    })
+    .catch(()=>{
+      console.log('Erro ao atualizar.')
+    })
+  }
+
+  // Deletando o Post
+  async function excluirPost(id){
+    await firebase.firestore().collection('posts')
+    // Pegando o id do <li>(do doc que ele clicou) que ele clicou
+    .doc(id)
+    .delete()
+    .then(()=>{
+      alert('Esse post foi excluido')
+    })
+  }
+
+  // Cadastrar Usuario (Assim que Cadastra ele loga automaticamente pelo firebase)
+  async function novoUsuario(){
+    // await: faz essa requisição mas espera ela acabar para proseguir
+    // função createUserWithEmailAndPassword() espera nos parametros um email e uma senha, então vou passar os useStates ja criados
+    await firebase.auth().createUserWithEmailAndPassword(email, senha)
+    .then((value)=>{
+      console.log(value)
+      setEmail('');
+      setSenha('');
+    })
+    .catch((error)=>{
+      // Existem mais outros tipos de Error Codes
+      if(error.code === 'auth/weak-password'){
+        alert('Senha muito fraca')
+      } else if(error.code === 'auth/email-already-in-use'){
+        alert('Email já existente')
+      }
+    })
+  }
+
+  // Logout / Deslogar Usuario
+  async function logout(){
+    await firebase.auth().signOut();
+  }
+
+  // Login Usuario
+  async function fazerLogin(){
+    await  firebase.auth().signInWithEmailAndPassword(email, senha)
+    .then((value)=> {
+      // Verificando o que ele recebe quando a gente faz esse login
+      console.log(value.user);
+    })
+    .catch((error)=> {
+      console.log('Erro ao fazer o login - ' + error)
+    })
+  }
+
+  return (
+    <div>
+      <h1>ReactJS + Firebase :)</h1> <br/>
+
+      {user && ( 
+        <div>
+          <strong>Seja bem vindo! (Você está logado)</strong> <br/>
+          <span>{userLogged.uid} - {userLogged.email}</span>
+          <br/> <br/>
+        </div>
+      )}
+
+      <div className="container">
+
+        <label>Email:</label>
+        <input type="text" value={email} onChange={ (e)=> setEmail(e.target.value) }/>
+
+        <label>Senha:</label>
+        <input type="password" value={senha} onChange={ (e)=> setSenha(e.target.value) }/> <br/>
+
+        <button onClick={ fazerLogin }>Fazer Login</button>
+        <button onClick={ novoUsuario }>Cadastrar</button> <br/>
+        <button onClick={ logout }>Sair da conta</button> <br/>
+      </div>
+      
+      <hr/>
+      <br/>
+
+      <div className="container">
+        <h2>Banco de Dados:</h2>
+      <label>ID:</label>
+      <input type="text" value={idPost} onChange={ (e)=> setIdPost(e.target.value) }/>
+      <label>Titulo:</label>
+      <textarea type="text" value={titulo} onChange={ (e)=> setTitulo(e.target.value) }/>
+
+      <label>Autor</label>
+      <input type="text" value={autor} onChange={ (e)=> setAutor(e.target.value)} />
+
+      <button onClick={ handleAdd }>Cadastrar</button>
+      <button onClick={ buscaPost }>Buscar Post</button>
+      <button onClick={ editarPost }>Editar Post</button> <br/>
+
+      <ul>
+        {posts.map((post)=> {
+          return(
+            <li key={post.id}>
+              <span>ID - {post.id}</span> <br/>
+              <span>Titulo: {post.titulo}</span> <br/>
+              <span>Autor: {post.autor}</span> <br/>
+              <button onClick={ ()=> excluirPost(post.id) }>Excluir Post</button> <br/> <br/>
+            </li>
+          )
+        })}
+      </ul>
+      </div>
+
+    </div>
+  );
+}
+
+export default App;
