@@ -1,0 +1,61 @@
+// As props são estaticas, mas ja as states nos conseguimos trocar o valor lá , ou seja são mutaveis, dinamicas...
+
+import React, { Component } from "react";
+
+class App extends Component{
+
+    // Criando um construtor desse Component e ele recebe pelo parametro as props
+    constructor(props){
+        // Para ele poder acessar todas a informações, e usar tudo do Component(pai) dentro do render();
+        super(props);
+        // Aqui dentro vamos colocar todas as states que são relacionadas a todo o Componente(App)
+        this.state = {
+            nome: 'Pedro',
+            contador: 0
+        };
+
+        // Dando ao pai para que ele enxerge e consiga utilizar tudo dentro da função passada.
+        this.aumentar = this.aumentar.bind(this);
+        this.diminuir = this.diminuir.bind(this);
+    }
+
+    aumentar() {
+        // Dentro dessa let criada com nome de state, vai ter todos os nossos states.
+        let state = this.state;
+
+        // Alterando o valor do contador que está dentro da nossa state.
+        state.contador += 1;
+        // Alterando o valor do nome que está dentro da nossa state.
+        state.nome = 'Luana';
+
+        // Setando e atualizando as alterações feitas na state.
+        this.setState(state);
+    }
+
+    diminuir(){
+        let state = this.state;
+        state.contador -= 1;
+        if(state.contador === 0){
+            alert('Opa chegou a zero')
+        }
+        state.nome = 'Jairo';
+        this.setState(state);
+    }
+
+    render(){
+        return(
+            <div>
+                <h2>Bem vindo {this.state.nome}</h2> 
+                <hr/>
+                <h1>Contador</h1>
+                <h3>
+                    <button onClick={this.diminuir}>-</button>
+                        {this.state.contador}
+                    <button onClick={this.aumentar}>+</button>
+                </h3>
+            </div>
+        );
+    }
+}
+
+export default App;

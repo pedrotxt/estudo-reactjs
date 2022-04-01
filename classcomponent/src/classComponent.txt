@@ -1,0 +1,53 @@
+import React, { Component } from "react";
+
+// Sempre vai estender de component, ele é um componente e uma classe
+class Equipe extends Component{
+  // Obrigatoriamente esse component class precisa de um metodo render
+  // Render é o que vai renderizar pra nós na tela
+
+  // ao invés de passar a props no render() ou algum parametro, agora nosso class component ja tem acesso a essa props
+  render(){
+    return(
+      <div>
+        <Sobre nome={this.props.nome} cargo={this.props.cargo} idade={this.props.idade}/>
+        <Social linkedin={this.props.linkedin} github={this.props.github}/>
+        <hr/>
+      </div>
+    );
+  }
+}
+
+// Criando um class component responsavel pelo nome cargo e idade
+class Sobre extends Component{
+  render(){
+    return(
+      <div>
+        <h2> Olá sou o {this.props.nome} </h2>
+        <h3>Cargo: {this.props.cargo} </h3>
+        <h3>Idade: {this.props.idade} anos</h3>
+      </div>
+    );
+  }
+}
+
+// Criando um componente burro, so quero que exiba algo
+const Social = (props) =>{
+  return(
+    <div>
+      <a href={props.linkedin}>Linkedin </a>
+      <a href={props.github}>GitHub</a>
+    </div>
+  );
+}
+
+function App(){
+  return (
+    <div>
+      <h1>Conheça nossa equipe:</h1>
+      <Equipe nome="Pedro" cargo="Programador" idade="20" github="https://github.com/pedrotxt"/>
+      <Equipe nome="Gabriel" cargo="Marketing" idade="26" linkedin="https://www.linkedin.com/in/pedro-henrique-p/"/>
+    </div>
+  );
+};
+
+export default App;

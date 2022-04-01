@@ -1,0 +1,40 @@
+import React, { Component } from "react";
+
+// Quando chamamos o componente App, a primeira coisa que é chamada para ser carregada é o construtor.
+// Então o construtor também é conhecido como um ciclo de vida desse Componente
+class App extends Component{
+
+    constructor(props){
+        super(props);
+        this.state = {
+            hora: '00:00:00'
+        };
+    }
+
+    // Outro ciclo de vida é a função componentDidMount, que funciona quando nosso componente é montado na tela(nesse exemplo o App), podemos fazer algo.
+    componentDidMount(){
+        setInterval(()=>{
+            this.setState({
+                hora: new Date().toLocaleTimeString()
+            });
+        },1000);
+    };
+
+    // Outro ciclo de vida é a função componentDidUpdate, que funciona quando nosso componente é atualizado ou por exemplo quando é atualizado um state do componente, podemos fazer algo.
+    componentDidUpdate(){
+        console.log('Atualizou!');
+    }
+
+    // Outro ciclo de vida é a função shouldComponentUpdate, que funciona retornando um 'true' ou 'false', um exemplo é a mesma coisa que perguntar: "Esse componente deve atualizar?" e ai voce retorna um true ou false, se você quer que ele atualize ou não
+    //shouldComponentUpdate(){};
+
+    render() {
+        return (
+            <div>
+                <h1>Meu Projeto {this.state.hora}</h1>
+            </div>
+        );
+    }
+}
+
+export default App;
